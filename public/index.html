@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <style>
+    textarea {
+      width:1024px;
+      height:768px;
+    }
+  </style>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script>
+    var uri = "ws://" + location.host + "/log/";
+    var logs = [];
+
+    $(function () {
+      print_log("onload");
+      ws = new WebSocket(uri);
+      ws.onopen = function (ev) {print_log("onopen")};
+      ws.onmessage = function (ev) {
+        if(ev.data != null) {
+          lines = ev.data.split("\n")
+          for(i = 0, n = lines.length; i < n; i++) {
+            print_log(lines[i]);
+          }
+        }
+      };
+      ws.onclose = function (ev) {print_log("onclose")};
+      ws.onerror = function (ev) {print_log("onerror")};
+    });
+
+    function print_log(message) {
+      logs.unshift(message)
+    }
+
+    function render() {
+      $("#log").text(logs.join("\n"));
+    }
+
+    setInterval(render, 1000);
+     
+
+  </script>
+</head>
+<body>
+<textarea id="log"></textarea>
+</body>
+</html>
